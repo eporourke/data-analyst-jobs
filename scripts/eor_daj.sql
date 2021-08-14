@@ -81,22 +81,39 @@ SELECT COUNT(DISTINCT title)
 
 --     Find the name of each company and its average star rating for all companies that have more than 5000 reviews across all locations. How many companies are there with more that 5000 reviews across all locations?
 
-SELECT company, AVG(star_rating), SUM(review_count), COUNT(location)
-	FROM data_analyst_jobs
+SELECT COUNT(DISTINCT company) AS companies,
+	AVG(star_rating),
+	SUM(review_count),
+	COUNT(location)
+FROM data_analyst_jobs
 	WHERE review_count > 5000
+
+SELECT company,
+	AVG(star_rating),
+	SUM(review_count),
+	COUNT(location)
+FROM data_analyst_jobs
+	WHERE review_count > 5000
+	AND company is NOT NULL
 	GROUP BY company;
-	
-	-- There are 41 companies with review counts over 5000 across all locations
+
+	-- There are 40 companies with review counts over 5000 across all locations
 
 --     Add the code to order the query in #9 from highest to lowest average star rating. Which company with more than 5000 reviews across all locations in the dataset has the highest star rating? What is that rating?
 
-SELECT company, ROUND(AVG(star_rating), 2) AS avg_rating, SUM(review_count), COUNT(location)
-	FROM data_analyst_jobs
+SELECT company,
+	AVG(star_rating) AS avg_rating,
+	SUM(review_count) AS review_count,
+	COUNT(DISTINCT location) AS locations
+FROM data_analyst_jobs
 	WHERE review_count > 5000
+	AND company IS NOT NULL
 	GROUP BY company
 	ORDER BY avg_rating DESC;
 
-	-- General Motors has the highest rating, but it only has one location
+SELECT *
+	FROM data_analyst_jobs
+	WHERE company LIKE '%Kaiser Permanente%'
 
 --     Find all the job titles that contain the word ‘Analyst’. How many different job titles are there?
 
@@ -110,12 +127,11 @@ SELECT COUNT(DISTINCT title)
 
 SELECT title, COUNT(DISTINCT title)
 	FROM data_analyst_jobs
-	WHERE title NOT LIKE '%ANALYST%'
-	AND title NOT LIKE '%Analytics%'
-	AND title NOT LIKE '%Analyst%'
+	WHERE title NOT iLIKE '%ANALYST%'
+	AND title NOT iLIKE '%Analytics%'
 	GROUP BY title;
 
-	-- CASE SENSITIVE?!?!?!
+	-- They concentrate on visualization with tools like Tableau and Power BI - 4!!!
 
 -- BONUS: You want to understand which jobs requiring SQL are hard to fill. Find the number of jobs by industry (domain) that require SQL and have been posted longer than 3 weeks.
 
@@ -123,13 +139,12 @@ SELECT title, COUNT(DISTINCT title)
 --     Order your results so that the domain with the greatest number of hard to fill jobs is at the top.
 --     Which three industries are in the top 4 on this list? How many jobs have been listed for more than 3 weeks for each of the top 4?
 
-SELECT *
-FROM data_analyst_jobs
-WHERE skill LIKE 'SQL'
-AND days_since_posting >
-
-SELECT COUNT(days_since_posting), domain
+SELECT
+	domain,
+	COUNT(days_since_posting) AS jobs_unfilled
 	FROM data_analyst_jobs
-WHERE days_since_posting > 21
- GROUP BY domain
-ORDER BY domain DESC;
+WHERE skill LIKE '%SQL%'
+AND domain IS NOT NULL
+AND days_since_posting > 21
+GROUP BY domain
+ORDER BY jobs_unfilled DESC;
